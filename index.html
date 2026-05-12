@@ -1,0 +1,386 @@
+<!DOCTYPE html><html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcade de 3 Juegos</title>
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }body{
+  background:linear-gradient(135deg,#0f172a,#1e293b,#334155);
+  min-height:100vh;
+  color:white;
+  overflow-x:hidden;
+}
+
+header{
+  text-align:center;
+  padding:30px;
+  animation:entrada 1s ease;
+}
+
+header h1{
+  font-size:3rem;
+  text-shadow:0 0 20px cyan;
+}
+
+header p{
+  margin-top:10px;
+  color:#cbd5e1;
+}
+
+@keyframes entrada{
+  from{
+    opacity:0;
+    transform:translateY(-30px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.menu{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+  padding:20px;
+}
+
+.card{
+  width:250px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:20px;
+  padding:20px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+  transition:0.4s;
+  cursor:pointer;
+  box-shadow:0 0 20px rgba(0,0,0,0.3);
+}
+
+.card:hover{
+  transform:translateY(-10px) scale(1.03);
+  box-shadow:0 0 30px cyan;
+}
+
+.card h2{
+  margin-bottom:10px;
+}
+
+.pantalla{
+  display:none;
+  padding:20px;
+  animation:fade 0.5s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:cyan;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+  margin-top:15px;
+}
+
+button:hover{
+  transform:scale(1.05);
+  background:white;
+}
+
+.volver{
+  background:#f43f5e;
+  color:white;
+}
+
+/* Juego 1 */
+#numeroInput{
+  padding:10px;
+  width:200px;
+  border:none;
+  border-radius:10px;
+  margin-top:15px;
+  text-align:center;
+  font-size:18px;
+}
+
+/* Juego 2 */
+.memoria-grid{
+  display:grid;
+  grid-template-columns:repeat(4,80px);
+  gap:10px;
+  justify-content:center;
+  margin-top:20px;
+}
+
+.carta{
+  width:80px;
+  height:80px;
+  background:#0ea5e9;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:12px;
+  font-size:2rem;
+  cursor:pointer;
+  user-select:none;
+  transition:0.3s;
+}
+
+.oculta{
+  background:#1e293b;
+  color:transparent;
+}
+
+/* Juego 3 */
+#canvasJuego{
+  background:#111827;
+  border:3px solid cyan;
+  border-radius:15px;
+  display:block;
+  margin:20px auto;
+}
+
+.info{
+  text-align:center;
+  margin-top:10px;
+}
+
+footer{
+  text-align:center;
+  padding:20px;
+  color:#94a3b8;
+}
+
+  </style>
+</head>
+<body><header>
+  <h1>🎮 Arcade de 3 Juegos</h1>
+  <p>Creado para funcionar en Acode usando HTML, CSS y JavaScript</p>
+</header><section class="menu" id="menuPrincipal">
+  <div class="card" onclick="abrirJuego('juego1')">
+    <h2>🔢 Adivina el Número</h2>
+    <p>Intenta descubrir el número secreto entre 1 y 100.</p>
+  </div>  <div class="card" onclick="abrirJuego('juego2')">
+    <h2>🧠 Memorama</h2>
+    <p>Encuentra todas las parejas de emojis.</p>
+  </div>  <div class="card" onclick="abrirJuego('juego3')">
+    <h2>🚀 Esquiva Obstáculos</h2>
+    <p>Mueve el jugador y evita los enemigos.</p>
+  </div>
+</section><!-- Juego 1 --><section class="pantalla" id="juego1">
+  <h2>🔢 Adivina el Número</h2>
+  <p>Escribe un número del 1 al 100.</p>  <input type="number" id="numeroInput" placeholder="Tu número">
+  <br>
+  <button onclick="verificarNumero()">Intentar</button>
+  <p id="resultadoNumero" style="margin-top:20px;"></p><button class="volver" onclick="volverMenu()">⬅ Volver</button>
+
+</section><!-- Juego 2 --><section class="pantalla" id="juego2">
+  <h2>🧠 Memorama</h2>
+  <p>Encuentra todas las parejas.</p>  <div class="memoria-grid" id="memoriaGrid"></div><button class="volver" onclick="volverMenu()">⬅ Volver</button>
+
+</section><!-- Juego 3 --><section class="pantalla" id="juego3">
+  <h2>🚀 Esquiva Obstáculos</h2>
+  <p>Usa los botones táctiles para mover al jugador.</p>  <div style="display:flex;justify-content:center;gap:20px;margin-top:15px;">
+    <button onclick="moverIzquierda()">⬅ Izquierda</button>
+    <button onclick="moverDerecha()">➡ Derecha</button>
+  </div><canvas id="canvasJuego" width="400" height="500"></canvas>
+
+  <div class="info">
+    <p>Puntuación: <span id="score">0</span></p>
+  </div><button class="volver" onclick="volverMenu()">⬅ Volver</button>
+
+</section><footer>
+  Hecho con ❤️ para Acode
+</footer><script>
+  function abrirJuego(id){
+    document.getElementById('menuPrincipal').style.display='none';
+    document.querySelectorAll('.pantalla').forEach(p=>p.style.display='none');
+    document.getElementById(id).style.display='block';
+  }
+
+  function volverMenu(){
+    document.getElementById('menuPrincipal').style.display='flex';
+    document.querySelectorAll('.pantalla').forEach(p=>p.style.display='none');
+  }
+
+  /* =======================
+     JUEGO 1
+  ======================= */
+
+  let numeroSecreto = Math.floor(Math.random()*100)+1;
+
+  function verificarNumero(){
+    const numero = Number(document.getElementById('numeroInput').value);
+    const resultado = document.getElementById('resultadoNumero');
+
+    if(numero === numeroSecreto){
+      resultado.innerHTML = '🎉 ¡Correcto! Adivinaste el número';
+      numeroSecreto = Math.floor(Math.random()*100)+1;
+    }else if(numero < numeroSecreto){
+      resultado.innerHTML = '📉 El número es más grande';
+    }else{
+      resultado.innerHTML = '📈 El número es más pequeño';
+    }
+  }
+
+  /* =======================
+     JUEGO 2
+  ======================= */
+
+  const emojis = ['🐱','🐶','🐸','🦊','🐵','🐼','🐱','🐶','🐸','🦊','🐵','🐼'];
+  emojis.sort(()=>Math.random()-0.5);
+
+  const grid = document.getElementById('memoriaGrid');
+
+  let primera = null;
+  let bloqueo = false;
+  let parejasEncontradas = 0;
+
+  emojis.forEach(emoji=>{
+    const carta = document.createElement('div');
+    carta.classList.add('carta','oculta');
+    carta.textContent = emoji;
+
+    carta.addEventListener('click',()=>{
+      if(bloqueo || !carta.classList.contains('oculta') || carta === primera) return;
+
+      carta.classList.remove('oculta');
+
+      if(!primera){
+        primera = carta;
+      }else{
+        if(primera.textContent === carta.textContent){
+          parejasEncontradas++;
+
+          primera = null;
+
+          if(parejasEncontradas === 6){
+            setTimeout(()=>{
+              alert('🎉 ¡Completaste el memorama!');
+            },300);
+          }
+
+        }else{
+          bloqueo = true;
+          setTimeout(()=>{
+            primera.classList.add('oculta');
+            carta.classList.add('oculta');
+            primera = null;
+            bloqueo = false;
+          },800);
+        }
+      }
+    });
+
+    grid.appendChild(carta);
+  });
+
+  /* =======================
+     JUEGO 3
+  ======================= */
+
+  const canvas = document.getElementById('canvasJuego');
+  const ctx = canvas.getContext('2d');
+
+  let jugador = {
+    x:180,
+    y:440,
+    w:40,
+    h:40,
+    speed:6
+  };
+
+  let obstaculos = [];
+  let puntos = 0;
+
+  document.addEventListener('keydown',(e)=>{
+    if(e.key === 'ArrowLeft' && jugador.x > 0){
+      jugador.x -= jugador.speed * 5;
+    }
+
+    if(e.key === 'ArrowRight' && jugador.x < canvas.width - jugador.w){
+      jugador.x += jugador.speed * 5;
+    }
+  });
+
+  function moverIzquierda(){
+    if(jugador.x > 0){
+      jugador.x -= jugador.speed * 8;
+    }
+  }
+
+  function moverDerecha(){
+    if(jugador.x < canvas.width - jugador.w){
+      jugador.x += jugador.speed * 8;
+    }
+  }
+
+  function crearObstaculo(){
+    obstaculos.push({
+      x:Math.random()*360,
+      y:-20,
+      w:40,
+      h:40,
+      speed:3 + Math.random()*3
+    });
+  }
+
+  function dibujarJugador(){
+    ctx.fillStyle='cyan';
+    ctx.fillRect(jugador.x,jugador.y,jugador.w,jugador.h);
+  }
+
+  function dibujarObstaculos(){
+    ctx.fillStyle='red';
+
+    obstaculos.forEach((o,index)=>{
+      o.y += o.speed;
+      ctx.fillRect(o.x,o.y,o.w,o.h);
+
+      if(o.y > canvas.height){
+        obstaculos.splice(index,1);
+        puntos++;
+        document.getElementById('score').textContent = puntos;
+      }
+
+      if(
+        jugador.x < o.x + o.w &&
+        jugador.x + jugador.w > o.x &&
+        jugador.y < o.y + o.h &&
+        jugador.h + jugador.y > o.y
+      ){
+        alert('💥 Perdiste. Puntuación: '+puntos);
+        obstaculos=[];
+        puntos=0;
+        document.getElementById('score').textContent = puntos;
+      }
+    });
+  }
+
+  function actualizarJuego(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    dibujarJugador();
+    dibujarObstaculos();
+
+    requestAnimationFrame(actualizarJuego);
+  }
+
+  setInterval(crearObstaculo,1000);
+  actualizarJuego();
+</script></body>
+</html>
